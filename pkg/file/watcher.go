@@ -27,27 +27,27 @@ const (
 )
 
 const (
-	CreateOp  = "CREATE"
-	WriteOp   = "WRITE"
-	RemoveOp  = "REMOVE"
-	RenameOp  = "RENAME"
-	MoveOp    = "MOVE"
-	UnknownOp = "UNKNOWN"
+	CreateOperation  = "CREATE"
+	WriteOperation   = "WRITE"
+	RemoveOperation  = "REMOVE"
+	RenameOperation  = "RENAME"
+	MoveOperation    = "MOVE"
+	UnknownOperation = "UNKNOWN"
 )
 
 var ops = map[Op]string{
-	Create: CreateOp,
-	Write:  WriteOp,
-	Remove: RemoveOp,
-	Rename: RenameOp,
-	Move:   MoveOp,
+	Create: CreateOperation,
+	Write:  WriteOperation,
+	Remove: RemoveOperation,
+	Rename: RenameOperation,
+	Move:   MoveOperation,
 }
 
 func (e Op) String() string {
 	if op, found := ops[e]; found {
 		return op
 	}
-	return UnknownOp
+	return UnknownOperation
 }
 
 type Event struct {
@@ -59,7 +59,7 @@ type Event struct {
 
 func (e Event) String() string {
 	if e.FileInfo == nil {
-		return UnknownOp
+		return UnknownOperation
 	}
 
 	pathType := FilePathType
