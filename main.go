@@ -11,31 +11,25 @@ func main() {
 		Version: "0.0.1",
 		Groups: []*cli.Group{
 			{
-				Name:  "logger",
-				Usage: "Logger commands",
-				Commands: []*cli.Command{
-					{
-						Name:  "--filter",
-						Usage: "filter by given criteria.",
-						Arguments: []string{
-							"date",
-						},
-						HandleFunc: cmd.ServeLogger,
-					},
-				},
-			},
-			{
-				Name:  "watcher",
+				Name:  "start",
 				Usage: "File watcher commands",
 				Commands: []*cli.Command{
 					{
-						Name:       "--hot",
-						Usage:      "path to the hot folder",
-						HandleFunc: cmd.ServeWatcher,
+						Name:  "logger",
+						Usage: "path to the hot folder",
+						Arguments: []string{
+							"date",
+							"regex",
+						},
+						HandleFunc: cmd.ServeLogger,
 					},
 					{
-						Name:       "--backup",
-						Usage:      "path to the backup folder",
+						Name:  "watcher",
+						Usage: "path to the hot folder",
+						Arguments: []string{
+							"hot",
+							"backup",
+						},
 						HandleFunc: cmd.ServeWatcher,
 					},
 				},

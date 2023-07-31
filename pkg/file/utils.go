@@ -10,12 +10,12 @@ import (
 )
 
 const (
-	appendMode = os.O_RDWR | os.O_CREATE | os.O_APPEND
-	truncateMode  = os.O_RDWR | os.O_CREATE | os.O_TRUNC
-	permissions       = 0644
+	appendMode   = os.O_RDWR | os.O_CREATE | os.O_APPEND
+	truncateMode = os.O_RDWR | os.O_CREATE | os.O_TRUNC
+	permissions  = 0644
 )
 
-func CreateFolder(path string) error {
+func CreateDir(path string) error {
 	if _, err := os.Stat(path); errors.Is(err, os.ErrNotExist) {
 		return os.Mkdir(path, os.ModePerm)
 	}
@@ -25,34 +25,34 @@ func CreateFolder(path string) error {
 
 func IsFile(path string) bool {
 	f, err := os.Stat(path)
-	
+
 	if err != nil {
 		return false
 	}
-	
+
 	return !f.IsDir()
 }
 
 func CopyFile(in string, out string) error {
 	fin, err := os.Open(in)
-	
+
 	if err != nil {
 		return fmt.Errorf("can't open a file: %v", err)
 	}
-	
+
 	defer fin.Close()
 
-	err = CreateFolder(filepath.Dir(out))
+	err = CreateDir(filepath.Dir(out))
 	if err != nil {
 		return fmt.Errorf("error while creating output directory: %v", err)
 	}
 
 	fout, err := os.Create(out)
-	
+
 	if err != nil {
 		return fmt.Errorf("can't create a new file: %v", err)
 	}
-	
+
 	defer fout.Close()
 
 	if _, err = io.Copy(fout, fin); err != nil {
@@ -62,7 +62,7 @@ func CopyFile(in string, out string) error {
 	return nil
 }
 
-func OverwriteFile(path string, data []byte) error {
+func WriteFile(path string, data []byte) error {
 	f, err := os.OpenFile(path, truncateMode, permissions)
 	if err != nil {
 		return err
@@ -78,15 +78,15 @@ func OverwriteFile(path string, data []byte) error {
 
 func ReadFile(path string) ([]byte, error) {
 	f, err := os.OpenFile(path, os.O_RDONLY, permissions)
-	
+
 	if err != nil {
 		return nil, err
 	}
-	
+
 	defer f.Close()
 
 	res, err := io.ReadAll(f)
-	
+
 	if err != nil {
 		return nil, err
 	}
@@ -105,6 +105,14 @@ func DeleteFile(path string) error {
 	return os.Remove(path)
 }
 
+func MakeTmpDir(path string) (string, error) {
+	if _, err := os.Stat(path); errors.Is(err, os.ErrNotExist) {
+		return os.MkdirTemp(path, "")
+	}
+
+	return "", ErrUnableToCreateTmpDir 
+}
+
 func FileScanner(file *os.File, cb func(string)) {
 	if file == nil || cb == nil {
 		return
@@ -114,4 +122,19 @@ func FileScanner(file *os.File, cb func(string)) {
 	for scanner.Scan() {
 		cb(scanner.Text())
 	}
+}
+
+func SameFile(left, right os.FileInfo) bool {
+	return os.SameFile(left, right)
+}
+
+func FilePathWalkDir(root string) ([]string, error) {
+	var files []string
+	err := filepath.Walk(root, func(path string, info os.FileInfo, err error) error {
+		if !info.IsDir() {
+			files = append(files, path)
+		}
+		return nil
+	})
+	return files, err
 }
