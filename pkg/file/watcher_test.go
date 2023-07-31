@@ -8,7 +8,7 @@ import (
 	"time"
 )
 
-func setup(t testing.TB) (string, func()) {
+func setupWatcherTests(t testing.TB) (string, func()) {
 	testDir, err := os.MkdirTemp(".", "")
 	if err != nil {
 		t.Fatal(err)
@@ -26,12 +26,6 @@ func setup(t testing.TB) (string, func()) {
 		if err := WriteFile(filePath, []byte{}); err != nil {
 			t.Fatal(err)
 		}
-	}
-
-	err = WriteFile(filepath.Join(testDir, ".dotfile"),
-		[]byte{})
-	if err != nil {
-		t.Fatal(err)
 	}
 
 	testDirTwo := filepath.Join(testDir, "testDirTwo")
@@ -103,7 +97,7 @@ func TestFileInfo(t *testing.T) {
 }
 
 func TestWatcherAdd(t *testing.T) {
-	testDir, teardown := setup(t)
+	testDir, teardown := setupWatcherTests(t)
 	defer teardown()
 
 	w := NewWatcher()
@@ -117,8 +111,8 @@ func TestWatcherAdd(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	if len(w.files) != 8 {
-		t.Errorf("expected len(w.files) to be 8, got %d", len(w.files))
+	if len(w.files) != 7 {
+		t.Errorf("expected len(w.files) to be 7, got %d", len(w.files))
 	}
 
 	if slice.IndexOf[string](w.names, testDir) == -1 {
