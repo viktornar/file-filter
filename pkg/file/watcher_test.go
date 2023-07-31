@@ -51,16 +51,8 @@ func setupWatcherTests(t testing.TB) (string, func()) {
 }
 
 func TestFileInfo(t *testing.T) {
+	fileInfo := NewFileInfoMock("fileInfo")
 	modTime := time.Now()
-
-	fileInfo := &fileInfo{
-		name:    "fileInfo",
-		size:    1,
-		mode:    os.ModeDir,
-		modTime: modTime,
-		sys:     nil,
-		dir:     true,
-	}
 
 	if fileInfo.Name() != "fileInfo" {
 		t.Fatalf("expected fileInfo.Name() to be 'fileInfo', got %s", fileInfo.Name())
@@ -74,8 +66,8 @@ func TestFileInfo(t *testing.T) {
 	if fileInfo.Sys() != nil {
 		t.Fatalf("expected fileInfo.Sys() to be nil, got %v", fileInfo.Sys())
 	}
-	if fileInfo.ModTime() != modTime {
-		t.Fatalf("expected fileInfo.ModTime() to be %v, got %v", modTime, fileInfo.ModTime())
+	if fileInfo.ModTime().After(time.Now()) {
+		t.Fatalf("expected fileInfo.ModTime() to be %v less than %v", fileInfo.ModTime(), modTime)
 	}
 	if fileInfo.Mode() != os.ModeDir {
 		t.Fatalf("expected fileInfo.Mode() to be os.ModeDir, got %#v", fileInfo.Mode())

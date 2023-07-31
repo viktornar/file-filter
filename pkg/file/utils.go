@@ -10,9 +10,9 @@ import (
 )
 
 const (
-	appendMode   = os.O_RDWR | os.O_CREATE | os.O_APPEND
-	truncateMode = os.O_RDWR | os.O_CREATE | os.O_TRUNC
-	permissions  = 0644
+	appendMode          = os.O_RDWR | os.O_CREATE | os.O_APPEND
+	truncateMode        = os.O_RDWR | os.O_CREATE | os.O_TRUNC
+	readWritePermission = 0644
 )
 
 func CreateDir(path string) error {
@@ -21,6 +21,10 @@ func CreateDir(path string) error {
 	}
 
 	return nil
+}
+
+func RenameFile(oldpath, newpath string) error {
+	return os.Rename(oldpath, newpath)
 }
 
 func IsFile(path string) bool {
@@ -63,7 +67,7 @@ func CopyFile(in string, out string) error {
 }
 
 func WriteFile(path string, data []byte) error {
-	f, err := os.OpenFile(path, truncateMode, permissions)
+	f, err := os.OpenFile(path, truncateMode, readWritePermission)
 	if err != nil {
 		return err
 	}
@@ -77,7 +81,7 @@ func WriteFile(path string, data []byte) error {
 }
 
 func ReadFile(path string) ([]byte, error) {
-	f, err := os.OpenFile(path, os.O_RDONLY, permissions)
+	f, err := os.OpenFile(path, os.O_RDONLY, readWritePermission)
 
 	if err != nil {
 		return nil, err
@@ -95,7 +99,7 @@ func ReadFile(path string) ([]byte, error) {
 }
 
 func OpenFile(path string) (*os.File, error) {
-	return os.OpenFile(path, appendMode, permissions)
+	return os.OpenFile(path, appendMode, readWritePermission)
 }
 
 func DeleteFile(path string) error {
@@ -110,7 +114,7 @@ func MakeTmpDir(path string) (string, error) {
 		return os.MkdirTemp(path, "")
 	}
 
-	return "", ErrUnableToCreateTmpDir 
+	return "", ErrUnableToCreateTmpDir
 }
 
 func FileScanner(file *os.File, cb func(string)) {

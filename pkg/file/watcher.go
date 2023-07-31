@@ -22,32 +22,32 @@ const (
 )
 
 const (
+	CreateName  = "CREATE"
+	WriteName   = "WRITE"
+	RemoveName  = "REMOVE"
+	RenameName  = "RENAME"
+	MoveName    = "MOVE"
+	UnknownName = "UNKNOWN"
+)
+
+const (
 	FilePathType = "FILE"
 	DirPathType  = "DIRECTORY"
 )
 
-const (
-	CreateOperation  = "CREATE"
-	WriteOperation   = "WRITE"
-	RemoveOperation  = "REMOVE"
-	RenameOperation  = "RENAME"
-	MoveOperation    = "MOVE"
-	UnknownOperation = "UNKNOWN"
-)
-
 var ops = map[Op]string{
-	Create: CreateOperation,
-	Write:  WriteOperation,
-	Remove: RemoveOperation,
-	Rename: RenameOperation,
-	Move:   MoveOperation,
+	Create: CreateName,
+	Write:  WriteName,
+	Remove: RemoveName,
+	Rename: RenameName,
+	Move:   MoveName,
 }
 
 func (e Op) String() string {
 	if op, found := ops[e]; found {
 		return op
 	}
-	return UnknownOperation
+	return UnknownName
 }
 
 type Event struct {
@@ -59,7 +59,7 @@ type Event struct {
 
 func (e Event) String() string {
 	if e.FileInfo == nil {
-		return UnknownOperation
+		return UnknownName
 	}
 
 	pathType := FilePathType
@@ -180,7 +180,7 @@ func (w *Watcher) WatchedFiles() map[string]os.FileInfo {
 func (w *Watcher) TriggerEvent(eventType Op, file os.FileInfo) {
 	w.Wait()
 	if file == nil {
-		file = &fileInfo{name: "triggered event", modTime: time.Now()}
+		file = &FileInfoMock{name: "triggered event", modTime: time.Now()}
 	}
 	w.Event <- Event{Op: eventType, Path: "-", FileInfo: file}
 }

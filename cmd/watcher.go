@@ -1,6 +1,7 @@
 package cmd
 
 import (
+	"file-filter/internal"
 	"file-filter/pkg/cli"
 	"file-filter/pkg/file"
 	"fmt"
@@ -19,13 +20,13 @@ func ServeWatcher(group *cli.Group, command *cli.Command, arguments []string) in
 
 	w := file.NewWatcher()
 
-	w.Add("./data")
+	w.Add(parsed[0])
 
 	go func() {
 		for {
 			select {
 			case event := <-w.Event:
-				fmt.Println(event)
+				internal.HandleWatcherEvent(event, parsed[1])
 			case err := <-w.Error:
 				log.Fatalln(err)
 			case <-w.Closed:
@@ -38,3 +39,4 @@ func ServeWatcher(group *cli.Group, command *cli.Command, arguments []string) in
 
 	return cli.Success
 }
+

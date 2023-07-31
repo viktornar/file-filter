@@ -5,7 +5,7 @@ import (
 	"time"
 )
 
-type fileInfo struct {
+type FileInfoMock struct {
 	name    string
 	size    int64
 	mode    os.FileMode
@@ -14,26 +14,39 @@ type fileInfo struct {
 	dir     bool
 }
 
-func (fs *fileInfo) IsDir() bool {
+func NewFileInfoMock(name string) *FileInfoMock {
+	modTime := time.Now()
+
+	return &FileInfoMock{
+		name:    name,
+		size:    1,
+		mode:    os.ModeDir,
+		modTime: modTime,
+		sys:     nil,
+		dir:     true,
+	}
+}
+
+func (fs *FileInfoMock) IsDir() bool {
 	return fs.dir
 }
 
-func (fs *fileInfo) ModTime() time.Time {
+func (fs *FileInfoMock) ModTime() time.Time {
 	return fs.modTime
 }
 
-func (fs *fileInfo) Mode() os.FileMode {
+func (fs *FileInfoMock) Mode() os.FileMode {
 	return fs.mode
 }
 
-func (fs *fileInfo) Name() string {
+func (fs *FileInfoMock) Name() string {
 	return fs.name
 }
 
-func (fs *fileInfo) Size() int64 {
+func (fs *FileInfoMock) Size() int64 {
 	return fs.size
 }
 
-func (fs *fileInfo) Sys() interface{} {
+func (fs *FileInfoMock) Sys() interface{} {
 	return fs.sys
 }
