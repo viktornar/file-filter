@@ -14,7 +14,7 @@ func setupSyncTests(t testing.TB) (string, func()) {
 		t.Fatal(err)
 	}
 
-	err = file.WriteFile(filepath.Join(testDir, "create_file.txt"), []byte{})
+	err = file.WriteFile(filepath.Join(testDir, "file.txt"), []byte{})
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -41,7 +41,7 @@ func TestFileCreate(t *testing.T) {
 	testDir, teardown := setupSyncTests(t)
 	defer teardown()
 
-	fileInfo := file.NewFileInfoMock("create_file.txt")
+	fileInfo := file.NewFileInfoMock("file.txt")
 
 	event := file.Event{Op: file.Create, Path: "-", FileInfo: fileInfo}
 
@@ -49,6 +49,22 @@ func TestFileCreate(t *testing.T) {
 
 	if _, err := os.Stat(filepath.Join(testDir, event.Name())); errors.Is(err, os.ErrNotExist) {
 		t.Errorf("expected to find %s in %s directory", event.Name(), testDir)
+	}
+}
+
+func TestFileRename(t *testing.T) {
+	testDir, teardown := setupSyncTests(t)
+	defer teardown()
+
+	fileInfo := file.NewFileInfoMock("file.txt")
+	newFileName := "new_file_name.txt"
+
+	event := file.Event{Op: file.Rename, Path: testDir + "/" + newFileName, FileInfo: fileInfo}
+
+	handleFileChange(event, testDir)
+
+	if _, err := os.Stat(filepath.Join(testDir, newFileName)); errors.Is(err, os.ErrNotExist) {
+		t.Errorf("expected to find %s in %s directory", newFileName, testDir)
 	}
 }
 
