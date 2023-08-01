@@ -3,7 +3,6 @@ package internal
 import (
 	"errors"
 	"file-filter/pkg/file"
-	"fmt"
 	"os"
 	"path/filepath"
 	"strings"
