@@ -3,34 +3,39 @@ package cli
 import (
 	"fmt"
 	"os"
-	"strings"
 )
 
 type App struct {
-	Name       string
-	Version    string
-	TryDefault bool
-	Groups     []*Group
+	Name    string
+	Version string
+	Group   *Group
 }
 
 func (a *App) Execute() {
 	if len(os.Args) > 1 {
-		for _, group := range a.Groups {
-			if os.Args[1] == group.Name {
-				if len(os.Args) > 2 {
-					for _, command := range group.Commands {
-						if os.Args[2] == command.Name {
-							os.Exit(command.HandleFunc(group, command, os.Args[3:]))
-						}
-					}
-				}
-
-				os.Exit(group.PrintHelp())
+		for _, command := range a.Group.Commands {
+			if os.Args[1] == command.Name {
+				os.Exit(command.HandleFunc(a.Group, command, os.Args[3:]))
 			}
+
+			os.Exit(a.Group.PrintHelp())
 		}
 
-		if a.TryDefault && len(a.Groups) > 0 && len(a.Groups[0].Commands) > 0 {
-			group := a.Groups[0]
+
+		if os.Args[1] == a.Group.Name {
+			if len(os.Args) > 2 {
+				for _, command := range a.Group.Commands {
+					if os.Args[2] == command.Name {
+						os.Exit(command.HandleFunc(a.Group, command, os.Args[3:]))
+					}
+				}
+			}
+
+			os.Exit(a.Group.PrintHelp())
+		}
+
+		if a.Group != nil && len(a.Group.Commands) > 0 {
+			group := a.Group
 			command := group.Commands[0]
 
 			os.Exit(command.HandleFunc(group, command, os.Args[1:]))
@@ -41,26 +46,11 @@ func (a *App) Execute() {
 }
 
 func (a *App) PrintHelp() int {
-	fmt.Println(a.Name + " version " + a.Version)
+	fmt.Printf("%s version %s\n", a.Name, a.Version)
 	fmt.Println()
 	fmt.Println("Usage:")
-	fmt.Println("  group command [flags] [arguments]")
+	fmt.Printf("  %s [flags] [arguments]\n", a.Group.Name)
 	fmt.Println()
-	fmt.Println("Available groups:")
-
-	max := 0
-
-	for _, group := range a.Groups {
-		if max < len(group.Name) {
-			max = len(group.Name)
-		}
-	}
-
-	max += 2
-
-	for _, group := range a.Groups {
-		fmt.Println("  " + group.Name + strings.Repeat(" ", max-len(group.Name)) + group.Usage)
-	}
 
 	return Success
 }

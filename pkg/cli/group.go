@@ -22,10 +22,10 @@ func (g *Group) PrintHelp() int {
 		}
 	}
 
-	max += 2
+	max += 2 // add two additional spaces
 
 	for _, command := range g.Commands {
-		fmt.Println("  " + command.Name + strings.Repeat(" ", max-len(command.Name)) + command.Usage)
+		fmt.Printf("  %s%s%s\n", command.Name, strings.Repeat(" ", max-len(command.Name)), command.Usage)
 	}
 
 	return Success

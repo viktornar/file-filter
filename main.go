@@ -9,29 +9,27 @@ func main() {
 	(&cli.App{
 		Name:    "FileFilter",
 		Version: "0.0.1",
-		Groups: []*cli.Group{
-			{
-				Name:  "start",
-				Usage: "starts file-filter commands",
-				Commands: []*cli.Command{
-					{
-						Name:  "logger",
-						Usage: "filter logs by given criteria",
-						Arguments: []string{
-							"dateFilter",
-							"regexFilter",
-						},
-						HandleFunc: cmd.ServeLogger,
+		Group: &cli.Group{
+			Name:  "start",
+			Usage: "starts file-filter commands",
+			Commands: []*cli.Command{
+				{
+					Name:  "logger",
+					Usage: "filter logs by given criteria",
+					Arguments: []string{
+						"dateFilter",
+						"regexFilter",
 					},
-					{
-						Name:  "watcher",
-						Usage: "watch file changes by given paths",
-						Arguments: []string{
-							"hotPath",
-							"backupPath",
-						},
-						HandleFunc: cmd.ServeWatcher,
+					HandleFunc: cmd.ServeLogger,
+				},
+				{
+					Name:  "watcher",
+					Usage: "watch file changes by given paths",
+					Arguments: []string{
+						"hotPath",
+						"backupPath",
 					},
+					HandleFunc: cmd.ServeWatcher,
 				},
 			},
 		},

@@ -46,9 +46,6 @@ func (c *Command) PrintHelp(group *Group) int {
 	}
 
 	fmt.Println(usage)
-	fmt.Println()
-	fmt.Println("Available flags:")
-	c.FlagSet().PrintDefaults()
 
 	return Success
 }
