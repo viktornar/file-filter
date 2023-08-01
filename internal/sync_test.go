@@ -14,14 +14,13 @@ func setupSyncTests(t testing.TB) (string, func()) {
 		t.Fatal(err)
 	}
 
-	err = file.WriteFile(filepath.Join(testDir, "file.txt"), []byte{})
-	if err != nil {
-		t.Fatal(err)
-	}
+	filesToCreate := []string{"file.txt", "delete_file.txt", "new_file.txt"}
 
-	err = file.WriteFile(filepath.Join(testDir, "delete_file.txt"), []byte{})
-	if err != nil {
-		t.Fatal(err)
+	for _, fileName := range filesToCreate {
+		err = file.WriteFile(filepath.Join(testDir, fileName), []byte{})
+		if err != nil {
+			t.Fatal(err)
+		}
 	}
 
 	abs, err := filepath.Abs(testDir)
@@ -57,14 +56,15 @@ func TestFileRename(t *testing.T) {
 	defer teardown()
 
 	fileInfo := file.NewFileInfoMock("file.txt")
-	newFileName := "new_file_name.txt"
+	newFileName := "new_file.txt"
+	newFileNameWithBak := newFileName + backupExtension
 
-	event := file.Event{Op: file.Rename, Path: testDir + "/" + newFileName, FileInfo: fileInfo}
+	event := file.Event{Op: file.Rename, Path: filepath.Join(testDir, newFileName), FileInfo: fileInfo}
 
 	handleFileChange(event, testDir)
 
-	if _, err := os.Stat(filepath.Join(testDir, newFileName)); errors.Is(err, os.ErrNotExist) {
-		t.Errorf("expected to find %s in %s directory", newFileName, testDir)
+	if _, err := os.Stat(filepath.Join(testDir, newFileNameWithBak)); errors.Is(err, os.ErrNotExist) {
+		t.Errorf("expected to find %s in %s directory", newFileNameWithBak, testDir)
 	}
 }
 
@@ -78,7 +78,7 @@ func TestFileDelete(t *testing.T) {
 
 	handleFileChange(event, testDir)
 
-	if _, err := os.Stat(filepath.Join(testDir, event.Name())); err == nil {
+	if _, err := os.Stat(filepath.Join(testDir, event.Name()+backupExtension)); err == nil {
 		t.Errorf("expected to remove %s in %s directory", event.Name(), testDir)
 	}
 }

@@ -43,12 +43,12 @@ func handleFileChange(event file.Event, destination string) {
 
 		if strings.HasPrefix(newName, deletePrefix) {
 			file.DeleteFile(event.Path)
-			file.DeleteFile(filepath.Join(destination, oldName+backupExtension))
+			file.DeleteFile(oldBackupPath)
 			return
 		}
 
 		if _, err := os.Stat(oldBackupPath); errors.Is(err, os.ErrNotExist) {
-			file.CopyFile(event.Path, filepath.Join(destination, newName+backupExtension))
+			file.CopyFile(event.Path, newBackupPath)
 			return
 		}
 
