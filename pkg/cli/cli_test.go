@@ -34,7 +34,8 @@ func setupCliTest(t testing.TB) *App {
 	return app
 }
 
-func TestWatcherCli(t *testing.T) {
+
+func TestWatcherCliWithAllArguments(t *testing.T) {
 	app := setupCliTest(t)
 	os.Args = []string{"file-filter", "watcher", "./test/hot", "./test/backup"}
 
@@ -45,14 +46,36 @@ func TestWatcherCli(t *testing.T) {
 	}
 }
 
-func TestLoggerCli(t *testing.T) {
+func TestLoggerCliWithAllArguments(t *testing.T) {
 	app := setupCliTest(t)
 	os.Args = []string{"file-filter", "logger", "2023-08-01", "test"}
 
 	code := app.Execute()
 
 	if code == Failure {
-		t.Fatalf("expected to correctly parse cli options")
+		t.Fatalf("expected to fail parse cli options")
+	}
+}
+
+func TestWatcherCliWithMissingArguments(t *testing.T) {
+	app := setupCliTest(t)
+	os.Args = []string{"file-filter", "watcher", "./test/hot"}
+
+	code := app.Execute()
+
+	if code == Success {
+		t.Fatalf("expected to failure due to missing argumets")
+	}
+}
+
+func TestLoggerCliWithMissingArguments(t *testing.T) {
+	app := setupCliTest(t)
+	os.Args = []string{"file-filter", "logger", "2023-08-01"}
+
+	code := app.Execute()
+
+	if code == Success {
+		t.Fatalf("expected to failure due to missing argumets")
 	}
 }
 
@@ -60,7 +83,7 @@ func handleFuncMock(command *Command, arguments []string) int {
 	_, err := command.Parse(arguments)
 
 	if err != nil {
-		return command.PrintHelp()
+		return Failure
 	}
 
 	return Success
