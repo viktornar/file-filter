@@ -14,8 +14,6 @@ const (
 )
 
 func HandleWatcherEvent(event file.Event, destination string) {
-	fmt.Println(event)
-
 	if event.IsDir() {
 		handleDirChange(event, destination)
 	} else {
@@ -51,6 +49,7 @@ func handleFileChange(event file.Event, destination string) {
 
 		if _, err := os.Stat(oldBackupPath); errors.Is(err, os.ErrNotExist) {
 			file.CopyFile(event.Path, filepath.Join(destination, newName))
+			return
 		}
 
 		file.RenameFile(oldBackupPath, newBackupPath)
