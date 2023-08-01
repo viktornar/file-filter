@@ -21,7 +21,7 @@ func ServeWatcher(name string, command *cli.Command, arguments []string) int {
 
 	initLogger(parsed[2], parsed[3], name)
 
-	logger.Printf("Starting file watcher with options: %s, %s %s %s\n", parsed[0], parsed[1], parsed[2], parsed[3])
+	logger.Printf("Starting file watcher with options: %s, %s, %s, %s\n", parsed[0], parsed[1], parsed[2], parsed[3])
 
 	w := initWatcher(parsed[0])
 

@@ -1,10 +1,9 @@
 package cli
 
 import (
+	"file-filter/pkg/logger"
 	"flag"
 	"fmt"
-	"log"
-	"os"
 )
 
 type Command struct {
@@ -51,7 +50,7 @@ func (c *Command) PrintHelp() int {
 }
 
 func (c *Command) PrintError(err error) int {
-	log.New(os.Stderr, "ERROR\t", log.Ldate|log.Ltime|log.Lshortfile)
+	logger.Error.Println(err)
 
 	return Failure
 }

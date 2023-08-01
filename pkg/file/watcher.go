@@ -35,7 +35,7 @@ const (
 	DirPathType  = "DIRECTORY"
 )
 
-var ops = map[Op]string{
+var Operations = map[Op]string{
 	Create: CreateName,
 	Write:  WriteName,
 	Remove: RemoveName,
@@ -44,7 +44,7 @@ var ops = map[Op]string{
 }
 
 func (e Op) String() string {
-	if op, found := ops[e]; found {
+	if op, found := Operations[e]; found {
 		return op
 	}
 	return UnknownName
