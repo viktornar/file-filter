@@ -3,42 +3,21 @@ package cli
 import (
 	"fmt"
 	"os"
+	"strings"
 )
 
 type App struct {
-	Name    string
-	Version string
-	Group   *Group
+	Name     string
+	Version  string
+	Commands []*Command
 }
 
 func (a *App) Execute() {
 	if len(os.Args) > 1 {
-		for _, command := range a.Group.Commands {
+		for _, command := range a.Commands {
 			if os.Args[1] == command.Name {
-				os.Exit(command.HandleFunc(a.Group, command, os.Args[3:]))
+				os.Exit(command.HandleFunc(command, os.Args[2:]))
 			}
-
-			os.Exit(a.Group.PrintHelp())
-		}
-
-
-		if os.Args[1] == a.Group.Name {
-			if len(os.Args) > 2 {
-				for _, command := range a.Group.Commands {
-					if os.Args[2] == command.Name {
-						os.Exit(command.HandleFunc(a.Group, command, os.Args[3:]))
-					}
-				}
-			}
-
-			os.Exit(a.Group.PrintHelp())
-		}
-
-		if a.Group != nil && len(a.Group.Commands) > 0 {
-			group := a.Group
-			command := group.Commands[0]
-
-			os.Exit(command.HandleFunc(group, command, os.Args[1:]))
 		}
 	}
 
@@ -49,7 +28,14 @@ func (a *App) PrintHelp() int {
 	fmt.Printf("%s version %s\n", a.Name, a.Version)
 	fmt.Println()
 	fmt.Println("Usage:")
-	fmt.Printf("  %s [flags] [arguments]\n", a.Group.Name)
+
+	commands := []string{}
+
+	for _, command := range a.Commands {
+		commands = append(commands, command.Name)
+	}
+
+	fmt.Printf("  %s <%s> <arguments>\n", a.Name, strings.Join(commands, "|"))
 	fmt.Println()
 
 	return Success

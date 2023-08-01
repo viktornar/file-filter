@@ -11,7 +11,7 @@ type Command struct {
 	Name       string
 	Usage      string
 	Arguments  []string
-	HandleFunc func(group *Group, command *Command, arguments []string) int
+	HandleFunc func(command *Command, arguments []string) int
 	flagSet    *flag.FlagSet
 }
 
@@ -36,10 +36,10 @@ func (c *Command) Parse(arguments []string) ([]string, error) {
 	return c.FlagSet().Args(), nil
 }
 
-func (c *Command) PrintHelp(group *Group) int {
+func (c *Command) PrintHelp() int {
 	fmt.Println("Usage:")
 
-	usage := "  " + group.Name + " " + c.Name
+	usage := "  " + c.Name
 
 	for _, argument := range c.Arguments {
 		usage += " <" + argument + ">"

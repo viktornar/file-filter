@@ -9,11 +9,11 @@ import (
 	"time"
 )
 
-func ServeWatcher(group *cli.Group, command *cli.Command, arguments []string) int {
+func ServeWatcher(command *cli.Command, arguments []string) int {
 	parsed, err := command.Parse(arguments)
 
 	if err != nil {
-		return command.PrintHelp(group)
+		return command.PrintHelp()
 	}
 
 	fmt.Printf("Starting file watcher with options: %s, %s\n", parsed[0], parsed[1])

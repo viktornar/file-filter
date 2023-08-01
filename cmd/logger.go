@@ -5,11 +5,11 @@ import (
 	"fmt"
 )
 
-func ServeLogger(group *cli.Group, command *cli.Command, arguments []string) int {
+func ServeLogger(command *cli.Command, arguments []string) int {
 	parsed, err := command.Parse(arguments)
 
 	if err != nil {
-		return command.PrintHelp(group)
+		return command.PrintHelp()
 	}
 
 	fmt.Printf("%s", parsed[0])
