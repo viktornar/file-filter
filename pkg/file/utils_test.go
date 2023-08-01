@@ -27,6 +27,11 @@ func setupUtilsTests(t testing.TB) (string, func()) {
 		}
 	}
 
+	err = WriteFile(filepath.Join(testDir, "multilinefile.txt"), []byte("first line\nsecond line"))
+	if err != nil {
+		t.Fatal(err)
+	}
+
 	abs, err := filepath.Abs(testDir)
 	if err != nil {
 		os.RemoveAll(testDir)
@@ -50,11 +55,49 @@ func TestFilePathWalkDir(t *testing.T) {
 		t.Fatal("expected to walk through given path")
 	}
 
-	expectedNames := []string{"file.txt", "file_1.txt", "file_2.txt", "file_3.txt"}
+	expectedNames := []string{"file.txt", "file_1.txt", "file_2.txt", "file_3.txt", "multilinefile.txt"}
 
 	for idx, file := range files {
 		if !strings.Contains(file, expectedNames[idx]) {
 			t.Errorf("Expected path %s to contain file name %s", file, expectedNames[idx])
 		}
+	}
+}
+
+func TestFileLastLineRead(t *testing.T) {
+	testDir, teardown := setupUtilsTests(t)
+	defer teardown()
+
+	fileHandler, err := OpenFile(filepath.Join(testDir, "multilinefile.txt"))
+
+	if err != nil {
+		t.Fatal("expected to find given file")
+	}
+
+	ReadLastLine(fileHandler, func(s string) {
+		if s != "second line" {
+			t.Fatal("expected to read only last line")
+		}
+	})
+}
+
+func TestFileScanner(t *testing.T) {
+	testDir, teardown := setupUtilsTests(t)
+	defer teardown()
+
+	fileHandler, err := OpenFile(filepath.Join(testDir, "multilinefile.txt"))
+
+	if err != nil {
+		t.Fatal("expected to find given file")
+	}
+
+	lines := []string{}
+
+	FileScanner(fileHandler, func(s string) {
+		lines = append(lines, s)
+	})
+
+	if strings.Join(lines, " ") != "first line second line" {
+		t.Fatal("expecte to read all files")
 	}
 }
