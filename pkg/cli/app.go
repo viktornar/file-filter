@@ -12,16 +12,16 @@ type App struct {
 	Commands []*Command
 }
 
-func (a *App) Execute() {
+func (a *App) Execute() int {
 	if len(os.Args) > 1 {
 		for _, command := range a.Commands {
 			if os.Args[1] == command.Name {
-				os.Exit(command.HandleFunc(command, os.Args[2:]))
+				return command.HandleFunc(command, os.Args[2:])
 			}
 		}
 	}
 
-	os.Exit(a.PrintHelp())
+	return a.PrintHelp()
 }
 
 func (a *App) PrintHelp() int {

@@ -3,10 +3,11 @@ package main
 import (
 	"file-filter/cmd"
 	"file-filter/pkg/cli"
+	"os"
 )
 
 func main() {
-	(&cli.App{
+	os.Exit((&cli.App{
 		Name:    "file-filter",
 		Version: "0.0.1",
 		Commands: []*cli.Command{
@@ -29,5 +30,5 @@ func main() {
 				HandleFunc: cmd.ServeWatcher,
 			},
 		},
-	}).Execute()
+	}).Execute())
 }
