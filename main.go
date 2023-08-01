@@ -2,13 +2,17 @@ package main
 
 import (
 	"file-filter/cmd"
+	"file-filter/internal"
 	"file-filter/pkg/cli"
 	"os"
 )
 
 func main() {
+	name := "file-filter"
+	ctx := internal.LoadCtx(name)
+
 	os.Exit((&cli.App{
-		Name:    "file-filter",
+		Name:    name,
 		Version: "0.0.1",
 		Commands: []*cli.Command{
 			{
@@ -18,7 +22,7 @@ func main() {
 					"dateFilter",
 					"nameFilter",
 				},
-				HandleFunc: cmd.ServeLogger,
+				HandleFunc: cmd.ServeLogger(&ctx),
 			},
 			{
 				Name:  "watcher",
@@ -26,10 +30,9 @@ func main() {
 				Arguments: []string{
 					"hotPath",
 					"backupPath",
-					"logPath",
 					"logLevel",
 				},
-				HandleFunc: cmd.ServeWatcher,
+				HandleFunc: cmd.ServeWatcher(&ctx),
 			},
 		},
 	}).Execute())

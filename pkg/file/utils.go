@@ -128,6 +128,33 @@ func FileScanner(file *os.File, cb func(string)) {
 	}
 }
 
+func ReadLastLine(file *os.File, cb func(string)) {
+	line := ""
+	var cursor int64 = 0
+	stat, _ := file.Stat()
+	filesize := stat.Size()
+
+	for {
+		cursor -= 1
+		file.Seek(cursor, io.SeekEnd)
+
+		char := make([]byte, 1)
+		file.Read(char)
+
+		if cursor != -1 && (char[0] == 10 || char[0] == 13) {
+			break
+		}
+
+		line = fmt.Sprintf("%s%s", string(char), line)
+
+		if cursor == -filesize {
+			break
+		}
+	}
+
+	cb(line)
+}
+
 func SameFile(left, right os.FileInfo) bool {
 	return os.SameFile(left, right)
 }

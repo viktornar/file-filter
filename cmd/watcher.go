@@ -9,50 +9,72 @@ import (
 	"log"
 	"os"
 	"os/signal"
-	"path/filepath"
-	"strconv"
 	"syscall"
 	"time"
 )
 
-func ServeWatcher(name string, command *cli.Command, arguments []string) int {
-	parsed, err := command.Parse(arguments)
+func ServeWatcher(ctx *internal.Ctx) func(string, *cli.Command, []string) int {
+	return func(name string, command *cli.Command, arguments []string) int {
+		parsed, err := command.Parse(arguments)
 
-	if err != nil {
-		return command.PrintHelp()
-	}
+		if err != nil && ctx.Watcher == (internal.Watcher{}) {
+			return command.PrintHelp()
+		}
 
-	initLogger(parsed[2], parsed[3], name)
-
-	logger.Printf("Starting file watcher with options: %s, %s, %s, %s\n", parsed[0], parsed[1], parsed[2], parsed[3])
-
-	w := initWatcher(parsed[0])
-
-	interrupt := make(chan os.Signal, 1)
-	signal.Notify(interrupt, os.Interrupt, syscall.SIGTERM)
-
-	go func() {
-		for {
-			select {
-			case event := <-w.Event:
-				logger.Debug.Printf("Received event %v", event)
-				internal.HandleWatcherEvent(event, parsed[1])
-			case err := <-w.Error:
-				log.Fatalln(err)
-			case sig := <-interrupt:
-				fmt.Printf("Watcher received signal %v\n", sig)
-				fmt.Println("Closing...")
-				w.Close()
-				return
-			case <-w.Closed:
-				return
+		// Load initial ctx for watcher
+		if ctx.Watcher == (internal.Watcher{}) {
+			ctx.Watcher = internal.Watcher{
+				HotPath:    parsed[0],
+				BackupPath: parsed[1],
+				LogLevel:   parsed[2],
+			}
+			internal.SaveCtx(name, ctx)
+		} else {
+			// Override loaded ctx with parsed arguments
+			for idx, argument := range parsed {
+				switch idx {
+				case 0:
+					ctx.Watcher.HotPath = argument
+				case 1:
+					ctx.Watcher.BackupPath = argument
+				case 2:
+					ctx.Watcher.LogLevel = argument
+				}
 			}
 		}
-	}()
 
-	w.Start(time.Millisecond * 100)
+		initLogger(ctx.Watcher.LogLevel, name)
 
-	return cli.Success
+		logger.Printf("Starting file watcher with options: %v\n", ctx.Watcher)
+
+		w := initWatcher(ctx.Watcher.HotPath)
+
+		interrupt := make(chan os.Signal, 1)
+		signal.Notify(interrupt, os.Interrupt, syscall.SIGTERM)
+
+		go func() {
+			for {
+				select {
+				case event := <-w.Event:
+					logger.Debug.Printf("Received event %v", event)
+					internal.HandleWatcherEvent(event, ctx.Watcher.BackupPath)
+				case err := <-w.Error:
+					log.Fatalln(err)
+				case sig := <-interrupt:
+					fmt.Printf("Watcher received signal %v\n", sig)
+					fmt.Println("Closing...")
+					w.Close()
+					return
+				case <-w.Closed:
+					return
+				}
+			}
+		}()
+
+		w.Start(time.Millisecond * 100)
+
+		return cli.Success
+	}
 }
 
 func initWatcher(path string) *file.Watcher {
@@ -61,8 +83,8 @@ func initWatcher(path string) *file.Watcher {
 	return w
 }
 
-func initLogger(logPath string, logLevel string, name string) {
-	fileHandler, err := file.OpenFile(filepath.Join(logPath, fmt.Sprintf("%s_%s.log", name, strconv.Itoa(int(time.Now().Unix())))))
+func initLogger(logLevel string, name string) {
+	fileHandler, err := file.OpenFile(fmt.Sprintf("%s.log", name))
 
 	if err != nil {
 		panic("Unable to create a log file")
