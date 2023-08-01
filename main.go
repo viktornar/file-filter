@@ -26,6 +26,8 @@ func main() {
 				Arguments: []string{
 					"hotPath",
 					"backupPath",
+					"logPath",
+					"logLevel",
 				},
 				HandleFunc: cmd.ServeWatcher,
 			},

@@ -11,7 +11,7 @@ type Command struct {
 	Name       string
 	Usage      string
 	Arguments  []string
-	HandleFunc func(command *Command, arguments []string) int
+	HandleFunc func(name string, command *Command, arguments []string) int
 	flagSet    *flag.FlagSet
 }
 

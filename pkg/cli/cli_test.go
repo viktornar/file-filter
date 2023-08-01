@@ -34,7 +34,6 @@ func setupCliTest(t testing.TB) *App {
 	return app
 }
 
-
 func TestWatcherCliWithAllArguments(t *testing.T) {
 	app := setupCliTest(t)
 	os.Args = []string{"file-filter", "watcher", "./test/hot", "./test/backup"}
@@ -79,7 +78,7 @@ func TestLoggerCliWithMissingArguments(t *testing.T) {
 	}
 }
 
-func handleFuncMock(command *Command, arguments []string) int {
+func handleFuncMock(name string, command *Command, arguments []string) int {
 	_, err := command.Parse(arguments)
 
 	if err != nil {

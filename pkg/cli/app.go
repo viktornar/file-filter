@@ -16,7 +16,7 @@ func (a *App) Execute() int {
 	if len(os.Args) > 1 {
 		for _, command := range a.Commands {
 			if os.Args[1] == command.Name {
-				return command.HandleFunc(command, os.Args[2:])
+				return command.HandleFunc(a.Name, command, os.Args[2:])
 			}
 		}
 	}

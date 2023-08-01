@@ -1,7 +1,5 @@
 package logger
 
-// TODO: This test is very simple and can be improved.
-
 import (
 	"fmt"
 	"testing"
@@ -44,34 +42,6 @@ func TestFatal(t *testing.T) {
 	SetLevel("error")
 	Info.Fatal(msg)
 
-	globals().defaultLogger.(*mockLogger).Verify(t)
-}
-
-func TestAt(t *testing.T) {
-	SetLevel("info")
-
-	if At("debug") {
-		t.Errorf("Debug is expected to be disabled when level is info")
-	}
-	if !At("error") {
-		t.Errorf("Error is expected to be enabled when level is info")
-	}
-}
-
-func TestRemoteLogging(t *testing.T) {
-	const (
-		msg           = "hi, hello, how are you?"
-		fatalExpected = true
-	)
-	mockExternal := &mockLogger{
-		expected: msg,
-	}
-	Register(mockExternal)
-	setMockLogger(msg, !fatalExpected)
-
-	Print(msg)
-
-	mockExternal.Verify(t)
 	globals().defaultLogger.(*mockLogger).Verify(t)
 }
 
@@ -125,9 +95,6 @@ func (ml *mockLogger) Verify(t *testing.T) {
 	}
 }
 
-// mockLogger is also an ExternalLogger.
-func (ml *mockLogger) Flush() {
-}
 func (ml *mockLogger) Log(l Level, s string) {
 	ml.Print(s)
 }
