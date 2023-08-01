@@ -16,7 +16,7 @@ func main() {
 				Usage: "filter logs by given criteria",
 				Arguments: []string{
 					"dateFilter",
-					"regexFilter",
+					"nameFilter",
 				},
 				HandleFunc: cmd.ServeLogger,
 			},

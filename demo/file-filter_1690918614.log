@@ -1,4 +1,0 @@
-2023/08/01 19:36:54.920961 Starting file watcher with options: ./demo/hot, ./demo/backup, ./demo, debug
-2023/08/01 19:37:01.240200 Received event DIRECTORY "hot" WRITE [/workspace/file-filter/demo/hot]
-2023/08/01 19:37:01.240238 Received event FILE "test" CREATE [/workspace/file-filter/demo/hot/test]
-2023/08/01 19:37:01.240250 File event was CREATE. Copying file test from /workspace/file-filter/demo/hot/test to demo/backup/test.bak

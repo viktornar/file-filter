@@ -7,8 +7,11 @@ import (
 	"file-filter/pkg/logger"
 	"fmt"
 	"log"
+	"os"
+	"os/signal"
 	"path/filepath"
 	"strconv"
+	"syscall"
 	"time"
 )
 
@@ -25,6 +28,9 @@ func ServeWatcher(name string, command *cli.Command, arguments []string) int {
 
 	w := initWatcher(parsed[0])
 
+	interrupt := make(chan os.Signal, 1)
+	signal.Notify(interrupt, os.Interrupt, syscall.SIGTERM)
+
 	go func() {
 		for {
 			select {
@@ -33,6 +39,11 @@ func ServeWatcher(name string, command *cli.Command, arguments []string) int {
 				internal.HandleWatcherEvent(event, parsed[1])
 			case err := <-w.Error:
 				log.Fatalln(err)
+			case sig := <-interrupt:
+				fmt.Printf("Watcher received signal %v\n", sig)
+				fmt.Println("Closing...")
+				w.Close()
+				return
 			case <-w.Closed:
 				return
 			}
