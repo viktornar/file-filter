@@ -43,7 +43,7 @@ func ServeWatcher(ctx *internal.Ctx) func(string, *cli.Command, []string) int {
 			}
 		}
 
-		logger.InitLogger(ctx.Watcher.LogLevel, name)
+		internal.InitLogger(ctx.Watcher.LogLevel, name)
 
 		logger.Debug.Printf("Starting file watcher with options: %v\n", ctx.Watcher)
 		fmt.Printf("Starting file watcher with options: %v\n", ctx.Watcher)
