@@ -40,7 +40,7 @@ Usage:
   file-filter <logger|watcher> <arguments>
 ```
 
-*Watcher is used for watching for the files changes* and *logger for viewing logs by given filters*. More comprehence usage examples below.
+**Watcher is used for watching for the files changes** and **logger for viewing logs in real time by given filters**. More comprehence usage examples below.
 
 For watcher:
 
@@ -74,7 +74,12 @@ Usage:
 - The logic related to CLI argument parsing was partially taken from my other home project. It served well there, but in this case, it is overkill and probably not well-suited.
 - For small and focused projects, simplicity is often key to achieving the desired outcome without unnecessary overhead or complexity, but I wanted to play with golang a little bit more and that is why some decision were made a little bit more complex than it supposed to be.
 - I wanted to implement my own logging with different log levels, but it became complex and not as useful as I initially thought
+- Options/arguments passed to **watcher** or **logger** need to be validated. 
 
-## How watcher is working
+## How the watcher works
 
-The watcher recursively scans all the files and directories, and on initial load, it adds them to a map collection. The file/directory name serves as the key, and additional file information (FileInfo) is stored as the value. Every 100 milliseconds, I retrieve information about files in the directory and poll for file change events in a separate goroutine. By comparing the new retrieved list of files with the file information stored in the map (which was loaded at application start), I can determine what kind of changes occurred. The worker then sends notifications using Go channels, and the main application is able to handle file changes in a separate function
+The watcher operates by recursively scanning all files and directories. Upon initial load, it adds them to a map collection where the file/directory name serves as the key, and additional file information (**FileInfo**) is stored as the corresponding value. Approximately every 100 milliseconds, I retrieve information about files in the directory and poll for file change events in a separate goroutine. By comparing the newly retrieved list of files with the file information stored in the map (which was loaded at application start), I can determine the nature of the changes that have occurred. Subsequently, the worker sends notifications using Go channels, allowing the main application to handle file changes in a separate function.
+
+## How the logger works
+
+The logger relies on the watcher module. It operates independently while also utilizing the **file.Watcher** to receive notifications about modifications made to the log file (**file-filter.log**). During startup, all files are scanned, and only filtered lines are printed. Later, a notification is sent to the logger when a file change occurs, prompting the logger to read the last line of the file and display it if the filter options are satisfied. Filtering is achieved by utilizing the **matchString** function.
