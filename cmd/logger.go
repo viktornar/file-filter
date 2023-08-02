@@ -56,10 +56,11 @@ func ServeLogger(ctx *internal.Ctx) func(string, *cli.Command, []string) int {
 			fmt.Println()
 		})
 
+		internal.InitLogger("debug", name)
 		logPath := fmt.Sprintf("%s.log", name)
 
 		if _, err := os.Stat(logPath); errors.Is(err, os.ErrNotExist) {
-			fmt.Printf("Log file %s is not initialized yes or it is not possible to create it. Quiting.", logPath)
+			fmt.Printf("Log file %s is not initialized yes or it is not possible to create it. Quiting...", logPath)
 			return cli.Failure
 		}
 
@@ -80,7 +81,7 @@ func ServeLogger(ctx *internal.Ctx) func(string, *cli.Command, []string) int {
 					return
 				case sig := <-interrupt:
 					fmt.Printf("Watcher received signal %v\n", sig)
-					fmt.Println("Closing...")
+					fmt.Print("Closing...")
 					w.Close()
 					return
 				case <-w.Closed:

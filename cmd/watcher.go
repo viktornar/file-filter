@@ -43,9 +43,10 @@ func ServeWatcher(ctx *internal.Ctx) func(string, *cli.Command, []string) int {
 			}
 		}
 
-		initLogger(ctx.Watcher.LogLevel, name)
+		logger.InitLogger(ctx.Watcher.LogLevel, name)
 
-		logger.Printf("Starting file watcher with options: %v\n", ctx.Watcher)
+		logger.Debug.Printf("Starting file watcher with options: %v\n", ctx.Watcher)
+		fmt.Printf("Starting file watcher with options: %v\n", ctx.Watcher)
 
 		w := initWatcher(ctx.Watcher.HotPath)
 
@@ -59,13 +60,16 @@ func ServeWatcher(ctx *internal.Ctx) func(string, *cli.Command, []string) int {
 					logger.Debug.Printf("Received event %v", event)
 					internal.HandleWatcherEvent(event, ctx.Watcher.BackupPath)
 				case err := <-w.Error:
+					logger.Error.Print(err)
 					log.Fatalln(err)
 				case sig := <-interrupt:
+					logger.Debug.Printf("Watcher received signal %v\n", sig)
 					fmt.Printf("Watcher received signal %v\n", sig)
-					fmt.Println("Closing...")
+					fmt.Print("Closing...")
 					w.Close()
 					return
 				case <-w.Closed:
+					logger.Debug.Println("Watcher finished his work")
 					return
 				}
 			}
@@ -81,15 +85,4 @@ func initWatcher(path string) *file.Watcher {
 	w := file.NewWatcher()
 	w.Add(path)
 	return w
-}
-
-func initLogger(logLevel string, name string) {
-	fileHandler, err := file.OpenFile(fmt.Sprintf("%s.log", name))
-
-	if err != nil {
-		panic("Unable to create a log file")
-	}
-
-	logger.SetLevel(logLevel)
-	logger.SetOutput(fileHandler)
 }

@@ -1,6 +1,7 @@
 package file
 
 import (
+	"file-filter/pkg/logger"
 	"file-filter/pkg/slice"
 	"fmt"
 	"os"
@@ -127,10 +128,12 @@ func (w *Watcher) list(name string) (map[string]os.FileInfo, error) {
 
 	return fileList, filepath.Walk(name, func(path string, info os.FileInfo, err error) error {
 		if err != nil {
+			logger.Error.Print(err)
 			return err
 		}
 
 		fileList[path] = info
+		logger.Debug.Printf("Adding file info to the file list %v\n", info)
 		return nil
 	})
 }
@@ -139,8 +142,11 @@ func (w *Watcher) remove(name string) (err error) {
 	w.mu.Lock()
 	defer w.mu.Unlock()
 
+	logger.Debug.Printf("Tryinh to remove file from list %s\n", name)
+
 	name, err = filepath.Abs(name)
 	if err != nil {
+		logger.Error.Print(err)
 		return err
 	}
 
@@ -214,10 +220,13 @@ func (w *Watcher) retrieveFileList() map[string]os.FileInfo {
 		}
 	}
 
+	logger.Debug.Printf("Retrieved file list %v\n", fileList)
+
 	return fileList
 }
 
 func (w *Watcher) Start(d time.Duration) error {
+	logger.Debug.Printf("Starting watcher with duration %s\n", d)
 	if d < time.Nanosecond {
 		return ErrDurationTooShort
 	}
@@ -290,6 +299,7 @@ func (w *Watcher) pollEvents(files map[string]os.FileInfo, evt chan Event, cance
 			case <-cancel:
 				return
 			case evt <- Event{Write, path, path, info}:
+				logger.Debug.Printf("Sending evt %s", Event{Write, path, path, info})
 			}
 		}
 	}
@@ -315,6 +325,7 @@ func (w *Watcher) pollEvents(files map[string]os.FileInfo, evt chan Event, cance
 				case <-cancel:
 					return
 				case evt <- e:
+					logger.Debug.Printf("Sending event %s", e)
 				}
 			}
 		}
