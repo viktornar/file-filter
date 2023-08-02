@@ -1,6 +1,7 @@
 package cmd
 
 import (
+	"errors"
 	"file-filter/internal"
 	"file-filter/pkg/cli"
 	"file-filter/pkg/file"
@@ -17,6 +18,11 @@ func ServeLogger(ctx *internal.Ctx) func(string, *cli.Command, []string) int {
 
 		if err != nil && ctx.Filter == (internal.Filter{}) {
 			return command.PrintHelp()
+		}
+
+		if !internal.IsValidDate(parsed[0]) {
+			fmt.Printf("Date need to be in such given formats %v\n", internal.GetDateLayouts())
+			return cli.Failure
 		}
 
 		if ctx.Filter == (internal.Filter{}) {
@@ -50,7 +56,14 @@ func ServeLogger(ctx *internal.Ctx) func(string, *cli.Command, []string) int {
 			fmt.Println()
 		})
 
-		w := initWatcher(fmt.Sprintf("%s.log", name))
+		logPath := fmt.Sprintf("%s.log", name)
+
+		if _, err := os.Stat(logPath); errors.Is(err, os.ErrNotExist) {
+			fmt.Printf("Log file %s is not initialized yes or it is not possible to create it. Quiting.", logPath)
+			return cli.Failure
+		}
+
+		w := initWatcher(logPath)
 
 		interrupt := make(chan os.Signal, 1)
 		signal.Notify(interrupt, os.Interrupt, syscall.SIGTERM)
@@ -71,6 +84,7 @@ func ServeLogger(ctx *internal.Ctx) func(string, *cli.Command, []string) int {
 					w.Close()
 					return
 				case <-w.Closed:
+					w.Close()
 					return
 				}
 			}
