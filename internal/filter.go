@@ -10,6 +10,6 @@ func PrintFilteredLine(line string, filter *Filter) {
 	nameMatch, _ := regexp.MatchString(filter.Name, line)
 
 	if nameMatch || dateMatch {
-		fmt.Println(line)
+		fmt.Print(line)
 	}
 }

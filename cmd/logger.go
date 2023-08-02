@@ -47,6 +47,7 @@ func ServeLogger(ctx *internal.Ctx) func(string, *cli.Command, []string) int {
 
 		file.FileScanner(fileHandler, func(line string) {
 			internal.PrintFilteredLine(line, &ctx.Filter)
+			fmt.Println()
 		})
 
 		w := initWatcher(fmt.Sprintf("%s.log", name))
