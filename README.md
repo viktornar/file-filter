@@ -40,7 +40,7 @@ Usage:
   file-filter <logger|watcher> <arguments>
 ```
 
-Watcher is used for watching for the files changes and logger for viewing logs by given filters. More comprehence usage examples below.
+*Watcher is used for watching for the files changes* and *logger for viewing logs by given filters*. More comprehence usage examples below.
 
 For watcher:
 
@@ -68,7 +68,7 @@ Usage:
   logger <dateFilter> <nameFilter>
 ```
 
-## What is wrong
+## Notes
 
 - For watching file changes, a custom solution was implemented. However, it has not undergone thorough testing, and in a real-life scenario, it would be better to use a well-tested and widely used library like fsnotify. Another option is to use inotify, but this approach might not be cross-platform compatible.
 - The logic related to CLI argument parsing was partially taken from my other home project. It served well there, but in this case, it is overkill and probably not well-suited.
